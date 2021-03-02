@@ -15,6 +15,8 @@ makerobo_B = 18
 def makerobo_setup(Rpin, Gpin, Bpin):
     global pins
     global p_R, p_G, p_B
+    global flag
+
     pins = {'pin_R':Rpin, 'pin_G':Gpin, 'pin_B':Bpin}
     GPIO.setmode(GPIO.BOARD)
     GPIO.setwarnings(False)
@@ -34,11 +36,11 @@ def makerobo_setup(Rpin, Gpin, Bpin):
     p_B.start(0)
 
     LCD1602.makerobo_init(0x27, 1)
-    #LCD1602.makerobo_write(0, 0, 'Hello!!!')
-    #LCD1602.makerobo_write(0, 1, 'Raspberry')
+    flag = 1
 
 def set_colorLED(x):
     if x == 0:
+        flag = 0
         while True:
             makerobo_set_Color(0x00FFFF)
 
@@ -63,29 +65,29 @@ def makerobo_set_Color(col):
 
 def makerobo_loop():
     substrate = substrateinterface.SubstrateInterface(
-    url="http://127.0.0.1:9933",
-    address_type=42,
-    type_registry=load_type_registry_file("/home/ubuntu/project/raspberrydemo/lcd3/customSpec.json"),
-)
+        url="http://127.0.0.1:9933",
+        address_type=42,
+        type_registry=load_type_registry_file("/home/ubuntu/project/raspberrydemo/lcd3/customSpec.json"),
+    )
 
     currentblock = 0
     while True:  
-        blockinfo = substrate.get_runtime_block()
-        data1 = json.dumps(blockinfo)
-        data2 = json.loads(data1)
-        blocknumber = data2['block']['header']['number']
-        if blocknumber == currentblock:
-            makerobo_set_Color(0xFF00FF)
-        else:
-            makerobo_set_Color(0x0000FF)
-
-        blocknumberstr = str(blocknumber)
-        blockshow = 'block:' + blocknumberstr
-        LCD1602.makerobo_write(0,0,blockshow)
-        now = time.strftime('%m/%d %H:%M:%S', time.localtime(time.time()))
-        LCD1602.makerobo_write(0, 1, now)
-        time.sleep(0.2)
-        currentblock = blocknumber
+        if flag
+            blockinfo = substrate.get_runtime_block()
+            data1 = json.dumps(blockinfo)
+            data2 = json.loads(data1)
+            blocknumber = data2['block']['header']['number']
+            if blocknumber == currentblock:
+                makerobo_set_Color(0xFF00FF)
+            else:
+                makerobo_set_Color(0x0000FF)
+            blocknumberstr = str(blocknumber)
+            blockshow = 'block:' + blocknumberstr
+            LCD1602.makerobo_write(0,0,blockshow)
+            now = time.strftime('%m/%d %H:%M:%S', time.localtime(time.time()))
+            LCD1602.makerobo_write(0, 1, now)
+            time.sleep(0.2)
+            currentblock = blocknumber
         #LCD1602.makerobo_clear()
 
 def makerobo_off():
@@ -106,6 +108,5 @@ if __name__ == "__main__":
     try:
         makerobo_setup(makerobo_R, makerobo_G, makerobo_B)
         makerobo_loop()
-	#makerobo_loop()
     except KeyboardInterrupt:
         makerobo_destroy()

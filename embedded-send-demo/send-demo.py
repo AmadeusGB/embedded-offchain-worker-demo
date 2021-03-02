@@ -6,7 +6,7 @@ import  platform
 import  os
 import  time
 import  json
-import Adafruit_DHT
+import  Adafruit_DHT
 
 makerobo_pin = 17
 makerobo_ds18b20 = ''  # ds18b20 设备
@@ -27,7 +27,7 @@ def makerobo_read():
     makerobo_tfile.close()                    # 关闭读取
     secondline = makerobo_text.split("\n")[1] # 格式化处理
     temperaturedata = secondline.split(" ")[9]# 获取温度数据
-    temperature = int(temperaturedata[2:])  # 去掉前两位
+    temperature = int(temperaturedata[2:])    # 去掉前两位
     # temperature = temperature / 1000          # 去掉小数点
     return temperature
 
