@@ -35,17 +35,11 @@ use serde_json::{Value};
 /// `KeyTypeId` via the keystore to sign the transaction.
 /// The keys can be inserted manually via RPC (see `author_insertKey`).
 pub const KEY_TYPE: KeyTypeId = KeyTypeId(*b"demo");
-pub const NUM_VEC_LEN: u32 = 10;
 /// The type to sign and send transactions.
 pub const UNSIGNED_TXS_PRIORITY: u64 = 100;
-
-// We are fetching information from the github public API about organization`substrate-developer-hub`.
-pub const TOKEN_SYM: &str = "DOT";
 pub const HTTP_REMOTE_REQUEST: &str = "http://192.168.43.38/node/work";
-
 pub const FETCH_TIMEOUT_PERIOD: u64 = 3000; // in milli-seconds
 pub const LOCK_TIMEOUT_EXPIRATION: u64 = FETCH_TIMEOUT_PERIOD + 1000; // in milli-seconds
-pub const LOCK_BLOCK_EXPIRATION: u32 = 3; // in block number
 
 /// Based on the above `KeyTypeId` we need to generate a pallet-specific crypto type wrapper.
 /// We can utilize the supported crypto kinds (`sr25519`, `ed25519` and `ecdsa`) and augment
@@ -104,7 +98,7 @@ pub trait Trait: system::Trait + CreateSignedTransaction<Call<Self>> {
 decl_storage! {
 	trait Store for Module<T: Trait> as Example {
 		// We save both the temperature and the blocknumber
-		Something get(fn something): u64;
+		Temperature get(fn temperature): u64;
 	}
 }
 
@@ -142,10 +136,10 @@ decl_module! {
 			let _ = ensure_none(origin)?;
 			// we don't need to verify the signature here because it has been verified in
 			//   `validate_unsigned` function when sending out the unsigned tx.
-			let Payload { temperature, public } = payload;
+			let Payload { temp, public } = payload;
 			let block_number = <frame_system::Module<T>>::block_number();
-			Something::put(temperature as u64);
-			Self::deposit_event(RawEvent::NewTemperature(temperature, public, block_number));
+			Temperature::put(temp);
+			Self::deposit_event(RawEvent::NewTemperature(temp, public, block_number));
 			Ok(())
 		}
 
