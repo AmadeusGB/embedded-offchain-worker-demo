@@ -75,7 +75,7 @@ pub mod crypto {
 
 #[derive(Encode, Decode, Clone, PartialEq, Eq, RuntimeDebug)]
 pub struct Payload<Public> {
-	temperature: u64,
+	temp: u64,
 	public: Public
 }
 
@@ -194,7 +194,7 @@ impl<T: Trait> Module<T> {
 		).map_err(|_| <Error<T>>::JsonParsingError)
 	}
 
-	fn offchain_unsigned_tx_signed_payload(temperature: u64) -> Result<(), Error<T>> {
+	fn offchain_unsigned_tx_signed_payload(temp: u64) -> Result<(), Error<T>> {
 		// Retrieve the signer to sign the payload
 		let signer = Signer::<T, T::AuthorityId>::any_account();
 
@@ -204,7 +204,7 @@ impl<T: Trait> Module<T> {
 		//   - `Some((account, Ok(())))`: transaction is successfully sent
 		//   - `Some((account, Err(())))`: error occured when sending the transaction
 		if let Some((_, res)) = signer.send_unsigned_transaction(
-			|acct| Payload { temperature, public: acct.public.clone() },
+			|acct| Payload { temp, public: acct.public.clone() },
 			Call::submit_temperature
 		) {
 			return res.map_err(|_| {
